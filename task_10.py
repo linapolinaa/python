@@ -1,0 +1,8 @@
+a = int(input("a:"))
+b = int(input("b:"))
+print("cумма:", a + b)
+print("pазность:", a - b)
+print("произведение:", a * b)
+print("частное:", a / b)
+print("остаток от деления:", a % b)
+print("степень:", a ** b)
