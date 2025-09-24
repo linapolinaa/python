@@ -1,18 +1,14 @@
-s = input()
-parts = s.split('.')
-if len(parts) != 4:
-    print("Некорректный IP-адрес")
+print("введите IP адрес в формате (XXX.XXX.XXX.XXX, XXX-число от 0 дo 255)")
+string=input()
+if string[3] != '.' or string[7] != '.' or string[11] != '.':
+        print("it is not a valid IP address")
+if int(string[0:3])>255 or int(string[0:3]) < 0:
+    print("это не IP адрес")
+elif int(string[4:6])>255 or int(string[4:7]) < 0:
+    print("это не IP адрес")
+elif int(string[8:11])>255 or int(string[8:11]) < 0:
+    print("это не IP адрес")
+elif int(string[12:15])>255 or int(string[12:15]) < 0:
+    print("это не IP адрес")
 else:
-    correct = True
-    for part in parts:
-        if not part.isdigit():
-            correct = False
-            break
-        num = int(part)
-        if num < 0 or num > 255:
-            correct = False
-            break
-    if correct:
-        print("Корректный IP-адрес")
-    else:
-        print("Некорректный IP-адрес")
+    print("это IP адрес")
