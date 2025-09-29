@@ -45,10 +45,8 @@ if __name__ == "__main__":
        
         merge_dicts(dict1, dict2)
        
-        print("\nРезультат слияния (первый словарь изменен):")
+        print("\nРезультат слияния :")
         print(dict1)
-        print(f"\nСловарь изменен на месте: {id(dict1) == original_id}")
         
     except Exception as e:
-        print(f"Ошибка: {e}")
-        print("Пожалуйста, вводите словари в правильном формате Python")
+        print(" вводите словари в правильном формате")

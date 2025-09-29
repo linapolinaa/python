@@ -38,8 +38,6 @@ if __name__ == "__main__":
         row_input = input("Введите строку матрицы (или Enter для завершения): ").strip()
         if not row_input:
             break
-        
-        # Преобразуем строку в список чисел
         try:
             row = [int(x) for x in row_input.split()]
             matrix.append(row)
