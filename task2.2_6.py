@@ -61,7 +61,6 @@ if __name__ == "__main__":
     
     user_input = input("Введите список: ")
     
-    # Преобразуем ввод в список без eval
     user_list = parse_list_input(user_input)
     
     unique = unique_elements(user_list)
