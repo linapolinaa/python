@@ -17,36 +17,29 @@ def merge_dicts(dict1, dict2):
 def parse_value(value_str):
     value_str = value_str.strip()
     if not value_str: return ""
-    
-    # Строки
+   
     if (value_str.startswith('"') and value_str.endswith('"')) or \
        (value_str.startswith("'") and value_str.endswith("'")):
         return value_str[1:-1]
     
-    # Числа
     if value_str.isdigit(): return int(value_str)
     if value_str.startswith('-') and value_str[1:].isdigit(): return -int(value_str[1:])
     
-    # Списки
     if value_str.startswith('[') and value_str.endswith(']'):
         inner = value_str[1:-1].strip()
         return [parse_value(item.strip()) for item in inner.split(',')] if inner else []
     
-    # Кортежи  
     if value_str.startswith('(') and value_str.endswith(')'):
         inner = value_str[1:-1].strip()
         return tuple(parse_value(item.strip()) for item in inner.split(',')) if inner else ()
-    
-    # Множества
+   
     if value_str.startswith('{') and value_str.endswith('}') and ':' not in value_str:
         inner = value_str[1:-1].strip()
         return {parse_value(item.strip()) for item in inner.split(',')} if inner else set()
     
-    # Словари
     if value_str.startswith('{') and value_str.endswith('}'):
         return parse_dict_input(value_str)
     
-    # Булевы значения
     if value_str == 'True': return True
     if value_str == 'False': return False
     if value_str == 'None': return None

@@ -1,5 +1,4 @@
 def transpose_matrix(matrix):
-   
     if not matrix or not matrix[0]:
         return []
     
@@ -16,7 +15,6 @@ def transpose_matrix(matrix):
     return result
 
 def print_matrix(matrix, title="Матрица"):
-   
     print(f"{title}:")
     for row in matrix:
         print(" ".join(f"{elem:4}" for elem in row))
@@ -38,17 +36,13 @@ if __name__ == "__main__":
         row_input = input("Введите строку матрицы (или Enter для завершения): ").strip()
         if not row_input:
             break
-        try:
-            row = [int(x) for x in row_input.split()]
-            matrix.append(row)
-        except ValueError:
-            print("Ошибка: вводите только целые числа, разделенные пробелами!")
-            continue
+        
+        row = [int(x) for x in row_input.split()]
+        matrix.append(row)
     
     if not matrix:
         print("Матрица пустая!")
     else:
-      
         first_len = len(matrix[0])
         for i, row in enumerate(matrix):
             if len(row) != first_len:
@@ -64,4 +58,3 @@ if __name__ == "__main__":
         
         print("Исходная матрица осталась неизменной:")
         print_matrix(matrix)
-        
