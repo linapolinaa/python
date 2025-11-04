@@ -4,11 +4,9 @@ def merge_dicts(dict1, dict2):
             if type(dict1[key]) is dict and type(value) is dict:
                 merge_dicts(dict1[key], value)
             elif type(dict1[key]) is list and type(value) is list:
-                for item in value:
-                    dict1[key].append(item)
+                dict1[key].extend(value)
             elif type(dict1[key]) is set and type(value) is set:
-                for item in value:
-                    dict1[key].add(item)
+                dict1[key].update(value)
             elif type(dict1[key]) is tuple and type(value) is tuple:
                 dict1[key] = dict1[key] + value
             else:
@@ -16,194 +14,86 @@ def merge_dicts(dict1, dict2):
         else:
             dict1[key] = value
 
-def parse_dict_input(input_string):
-    # Убираем пробелы и проверяем скобки
-    input_string = input_string.strip()
-    if not input_string.startswith('{') or not input_string.endswith('}'):
-        return {}
-    
-    # Убираем внешние скобки
-    content = input_string[1:-1].strip()
-    if not content:
-        return {}
-    
-    result = {}
-    i = 0
-    n = len(content)
-    
-    while i < n:
-        # Пропускаем пробелы
-        while i < n and content[i] == ' ':
-            i += 1
-        
-        if i >= n:
-            break
-            
-        # Ищем ключ
-        key_start = i
-        if content[i] == '"':
-            # Ключ в кавычках
-            i += 1
-            while i < n and content[i] != '"':
-                i += 1
-            if i < n:
-                i += 1  # Пропускаем закрывающую кавычку
-            key = content[key_start + 1:i - 1]
-        else:
-            # Ключ без кавычек
-            while i < n and content[i] != ':':
-                i += 1
-            key = content[key_start:i].strip()
-        
-        # Пропускаем двоеточие
-        while i < n and content[i] != ':':
-            i += 1
-        if i < n:
-            i += 1
-        
-        # Пропускаем пробелы после двоеточия
-        while i < n and content[i] == ' ':
-            i += 1
-        
-        if i >= n:
-            break
-            
-        # Ищем значение
-        value_start = i
-        
-        if content[i] == '"':
-            # Строка
-            i += 1
-            while i < n and content[i] != '"':
-                i += 1
-            if i < n:
-                i += 1
-            value = content[value_start:i]
-            
-        elif content[i] == '[':
-            # Список
-            bracket_count = 1
-            i += 1
-            while i < n and bracket_count > 0:
-                if content[i] == '[':
-                    bracket_count += 1
-                elif content[i] == ']':
-                    bracket_count -= 1
-                i += 1
-            value = content[value_start:i]
-            
-        elif content[i] == '(':
-            # Кортеж
-            paren_count = 1
-            i += 1
-            while i < n and paren_count > 0:
-                if content[i] == '(':
-                    paren_count += 1
-                elif content[i] == ')':
-                    paren_count -= 1
-                i += 1
-            value = content[value_start:i]
-            
-        elif content[i] == '{':
-            # Словарь или множество
-            brace_count = 1
-            i += 1
-            while i < n and brace_count > 0:
-                if content[i] == '{':
-                    brace_count += 1
-                elif content[i] == '}':
-                    brace_count -= 1
-                i += 1
-            value = content[value_start:i]
-            
-        else:
-            # Простое значение (число и т.д.)
-            while i < n and content[i] != ',':
-                i += 1
-            value = content[value_start:i].strip()
-        
-        # Парсим значение
-        parsed_value = parse_value(value)
-        result[key] = parsed_value
-        
-        # Пропускаем запятую
-        while i < n and content[i] != ',':
-            i += 1
-        if i < n:
-            i += 1
-    
-    return result
-
 def parse_value(value_str):
     value_str = value_str.strip()
+    if not value_str: return ""
     
-    if not value_str:
-        return ""
-    
-    # Строка
-    if (value_str.startswith('"') and value_str.endswith('"')):
+    # Строки
+    if (value_str.startswith('"') and value_str.endswith('"')) or \
+       (value_str.startswith("'") and value_str.endswith("'")):
         return value_str[1:-1]
     
-    # Число
-    if value_str.isdigit():
-        return int(value_str)
+    # Числа
+    if value_str.isdigit(): return int(value_str)
+    if value_str.startswith('-') and value_str[1:].isdigit(): return -int(value_str[1:])
     
-    # Список
+    # Списки
     if value_str.startswith('[') and value_str.endswith(']'):
         inner = value_str[1:-1].strip()
-        if not inner:
-            return []
-        items = []
-        for item in inner.split(','):
-            items.append(parse_value(item.strip()))
-        return items
+        return [parse_value(item.strip()) for item in inner.split(',')] if inner else []
     
-    # Кортеж
+    # Кортежи  
     if value_str.startswith('(') and value_str.endswith(')'):
         inner = value_str[1:-1].strip()
-        if not inner:
-            return ()
-        items = []
-        for item in inner.split(','):
-            items.append(parse_value(item.strip()))
-        return tuple(items)
+        return tuple(parse_value(item.strip()) for item in inner.split(',')) if inner else ()
     
-    # Множество
+    # Множества
     if value_str.startswith('{') and value_str.endswith('}') and ':' not in value_str:
         inner = value_str[1:-1].strip()
-        if not inner:
-            return set()
-        items = set()
-        for item in inner.split(','):
-            items.add(parse_value(item.strip()))
-        return items
+        return {parse_value(item.strip()) for item in inner.split(',')} if inner else set()
     
-    # Словарь
+    # Словари
     if value_str.startswith('{') and value_str.endswith('}'):
         return parse_dict_input(value_str)
     
     # Булевы значения
-    if value_str == 'True':
-        return True
-    if value_str == 'False':
-        return False
-    if value_str == 'None':
-        return None
+    if value_str == 'True': return True
+    if value_str == 'False': return False
+    if value_str == 'None': return None
     
     return value_str
 
-if __name__ == "__main__":
-    print("Введите первый словарь:")
-    user_input1 = input().strip()
-    print("Введите второй словарь:")
-    user_input2 = input().strip()
+def parse_dict_input(input_string):
+    input_string = input_string.strip()
+    if not (input_string.startswith('{') and input_string.endswith('}')): return {}
     
-    dict1 = parse_dict_input(user_input1)
-    dict2 = parse_dict_input(user_input2)
+    content = input_string[1:-1].strip()
+    if not content: return {}
+    
+    result = {}
+    current_key = ""
+    current_value = ""
+    in_key = True
+    depth = 0
+    
+    for char in content + ',':
+        if char in '{[(': depth += 1
+        elif char in '}])': depth -= 1
+        
+        if char == ':' and depth == 0 and in_key:
+            in_key = False
+            current_key = current_key.strip()
+            if (current_key.startswith('"') and current_key.endswith('"')) or \
+               (current_key.startswith("'") and current_key.endswith("'")):
+                current_key = current_key[1:-1]
+        elif char == ',' and depth == 0 and not in_key:
+            if current_key:
+                result[current_key] = parse_value(current_value.strip())
+            current_key, current_value, in_key = "", "", True
+        else:
+            if in_key:
+                current_key += char
+            else:
+                current_value += char
+    
+    return result
+
+if __name__ == "__main__":
+    dict1 = parse_dict_input(input("Введите первый словарь: ").strip())
+    dict2 = parse_dict_input(input("Введите второй словарь: ").strip())
     
     print(f"Первый словарь: {dict1}")
     print(f"Второй словарь: {dict2}")
     
     merge_dicts(dict1, dict2)
-    
     print(f"Результат слияния: {dict1}")
