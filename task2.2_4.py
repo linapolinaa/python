@@ -1,5 +1,5 @@
 def transpose_matrix(matrix):
-    if not matrix or not matrix[0]:
+    if not matrix:
         return []
     
     rows = len(matrix)
@@ -43,18 +43,8 @@ if __name__ == "__main__":
     if not matrix:
         print("Матрица пустая!")
     else:
-        first_len = len(matrix[0])
-        for i, row in enumerate(matrix):
-            if len(row) != first_len:
-                print(f"все строки должны быть одинаковой длины")
-                print(f"cтрока {i+1} имеет длину {len(row)}, а должна быть {first_len}")
-                exit()
-        
         print_matrix(matrix, "Исходная матрица")
         
         transposed = transpose_matrix(matrix)
         
         print_matrix(transposed, "Транспонированная матрица")
-        
-        print("Исходная матрица осталась неизменной:")
-        print_matrix(matrix)
