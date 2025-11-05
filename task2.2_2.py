@@ -1,92 +1,31 @@
-def merge_dicts(dict1, dict2):
-    for key, value in dict2.items():
-        if key in dict1:
-            if type(dict1[key]) is dict and type(value) is dict:
-                merge_dicts(dict1[key], value)
-            elif type(dict1[key]) is list and type(value) is list:
-                dict1[key].extend(value)
-            elif type(dict1[key]) is set and type(value) is set:
-                dict1[key].update(value)
-            elif type(dict1[key]) is tuple and type(value) is tuple:
-                dict1[key] = dict1[key] + value
-            else:
-                dict1[key] = value
-        else:
-            dict1[key] = value
-
-def parse_value(value_str):
-    value_str = value_str.strip()
-    if not value_str: return ""
-   
-    if (value_str.startswith('"') and value_str.endswith('"')) or \
-       (value_str.startswith("'") and value_str.endswith("'")):
-        return value_str[1:-1]
-    
-    if value_str.isdigit(): return int(value_str)
-    if value_str.startswith('-') and value_str[1:].isdigit(): return -int(value_str[1:])
-    
-    if value_str.startswith('[') and value_str.endswith(']'):
-        inner = value_str[1:-1].strip()
-        return [parse_value(item.strip()) for item in inner.split(',')] if inner else []
-    
-    if value_str.startswith('(') and value_str.endswith(')'):
-        inner = value_str[1:-1].strip()
-        return tuple(parse_value(item.strip()) for item in inner.split(',')) if inner else ()
-   
-    if value_str.startswith('{') and value_str.endswith('}') and ':' not in value_str:
-        inner = value_str[1:-1].strip()
-        return {parse_value(item.strip()) for item in inner.split(',')} if inner else set()
-    
-    if value_str.startswith('{') and value_str.endswith('}'):
-        return parse_dict_input(value_str)
-    
-    if value_str == 'True': return True
-    if value_str == 'False': return False
-    if value_str == 'None': return None
-    
-    return value_str
-
-def parse_dict_input(input_string):
-    input_string = input_string.strip()
-    if not (input_string.startswith('{') and input_string.endswith('}')): return {}
-    
-    content = input_string[1:-1].strip()
-    if not content: return {}
-    
-    result = {}
-    current_key = ""
-    current_value = ""
-    in_key = True
-    depth = 0
-    
-    for char in content + ',':
-        if char in '{[(': depth += 1
-        elif char in '}])': depth -= 1
+def combine_dictionaries(primary_dict, secondary_dict):
+    for dict_key, dict_value in secondary_dict.items():
+        if dict_key not in primary_dict:
+            primary_dict[dict_key] = dict_value
+            continue
+            
+        existing_value = primary_dict[dict_key]
         
-        if char == ':' and depth == 0 and in_key:
-            in_key = False
-            current_key = current_key.strip()
-            if (current_key.startswith('"') and current_key.endswith('"')) or \
-               (current_key.startswith("'") and current_key.endswith("'")):
-                current_key = current_key[1:-1]
-        elif char == ',' and depth == 0 and not in_key:
-            if current_key:
-                result[current_key] = parse_value(current_value.strip())
-            current_key, current_value, in_key = "", "", True
+        if isinstance(existing_value, dict) and isinstance(dict_value, dict):
+            combine_dictionaries(existing_value, dict_value)
+        
+        elif isinstance(existing_value, list) and isinstance(dict_value, list):
+            existing_value += dict_value
+        
+        elif isinstance(existing_value, set) and isinstance(dict_value, set):
+            existing_value |= dict_value
+        
+        elif isinstance(existing_value, tuple) and isinstance(dict_value, tuple):
+            primary_dict[dict_key] = existing_value + dict_value
+       
         else:
-            if in_key:
-                current_key += char
-            else:
-                current_value += char
+            primary_dict[dict_key] = dict_value
     
-    return result
+    return primary_dict
 
-if __name__ == "__main__":
-    dict1 = parse_dict_input(input("Введите первый словарь: ").strip())
-    dict2 = parse_dict_input(input("Введите второй словарь: ").strip())
-    
-    print(f"Первый словарь: {dict1}")
-    print(f"Второй словарь: {dict2}")
-    
-    merge_dicts(dict1, dict2)
-    print(f"Результат слияния: {dict1}")
+first_dict = {"a": 1, "b": {"c": 1, "f": 4}}
+second_dict = {"d": 1, "b": {"c": 2, "e": 3}}
+merged_result = combine_dictionaries(first_dict, second_dict)
+print("первый словарь: '"'a'"': 1, '"'b'"': {'"'c'"': 1, '"'f'"': 4} ")
+print ("второй словарь: '"'d'"': 1, '"'b'"': {'"'c'"': 2, '"'e'"': 3}")
+print(f"результат: {merged_result}")
