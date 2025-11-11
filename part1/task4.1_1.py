@@ -28,5 +28,5 @@ plt.ylabel("h(x)")
 plt.grid(True)
 
 plt.tight_layout()
-plt.savefig("task4.1_1_plot.png")
+plt.savefig('part1/task4..1_1_plot.png')
 plt.show()
