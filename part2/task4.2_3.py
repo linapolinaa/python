@@ -1,0 +1,20 @@
+import numpy as np
+
+def solve_linear_system():
+    A = np.array([
+        [-2.0, -8.5, -3.4, 3.5],
+        [0.0, 2.4, 0.0, 8.2],
+        [2.5, 1.6, 2.1, 3.0],
+        [0.3, -0.4, -4.8, 4.6]
+    ])
+    
+    B = np.array([-1.88, -3.28, -0.5, -2.83])
+    
+    X = np.linalg.inv(A) @ B
+   
+    print("Решение системы:")
+    for i, x in enumerate(X, 1):
+        print(f"x{i} = {x:.1f}")
+
+if __name__ == "__main__":
+    solve_linear_system()
