@@ -1,17 +1,30 @@
+import pytest
+
 def is_palindrome(word):
     word_str = str(word)
     return word_str == word_str[::-1]
 
-def test_is_palindrome():
-    assert is_palindrome("radar") == True
-    assert is_palindrome("level") == True
-    assert is_palindrome("hello") == False
-    assert is_palindrome("a") == True
-    assert is_palindrome("") == True
-    assert is_palindrome(121) == True
-    assert is_palindrome(123) == False
-    assert is_palindrome(1221) == True
+@pytest.mark.parametrize("input_value,expected", [
+    ("radar", True),
+    ("level", True),
+    ("hello", False),
+    ("a", True),
+    ("", True),
+    (121, True),
+    (123, False),
+    (1221, True),
+    ("шалаш", True),
+    ("топот", True),
+    ("world", False),
+    (0, True),
+    (12321, True),
+    (1234, False),
+    ("12321", True),
+])
+def test_is_palindrome(input_value, expected):
+    assert is_palindrome(input_value) == expected
 
-if __name__ == "__main__":
-    test_is_palindrome()
-    print("Все тесты прошли")
+def test_additional_cases():
+    assert is_palindrome("Racecar".lower()) == True
+    assert is_palindrome([1, 2, 1]) == True
+    assert is_palindrome("!@#@!") == True
