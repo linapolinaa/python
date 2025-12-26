@@ -1,0 +1,6 @@
+venv_part1/
+venv_part2/
+venv_part3/
+__pycache__/
+*.pyc
+/task4.4_1.py
